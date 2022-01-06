@@ -6,3 +6,13 @@ export class Cliente {
   email: string;
 
 }
+export interface SuccesCliente{
+  mensaje?:string,
+  cliente:Cliente;
+}
+
+export class ClienteErrors{
+  nombre?:string,
+  apellido?:string,
+  email?:string,
+}
