@@ -8,6 +8,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map,catchError,tap } from 'rxjs/operators';
 import swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { PaginatorCliente } from './pageable.models';
 
 
 @Injectable()
@@ -35,6 +36,15 @@ export class ClienteService {
       
     );
   }
+  getClientesPage(page:number): Observable<PaginatorCliente>{
+    return this.http.get(`${this.urlEndPoint}/page/${page}`).pipe(
+      map((response:any)=>{
+        return response as PaginatorCliente;
+      })
+    )
+  }
+
+
   getCliente(id:number):Observable<Cliente>{
     return this.http.get<Cliente>(`${this.urlEndPoint}/${id}`).pipe(
     

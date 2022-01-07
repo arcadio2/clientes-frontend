@@ -39,6 +39,7 @@
         </tr>
       </tbody>
     </table>
-
+    <app-paginator *ngIf="paginator" [paginator]="paginator" (eventPaginador)="change($event)"></app-paginator>
+    
   </div>
 </div>

@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { Cliente } from './cliente';
 import { ClienteService } from './cliente.service';
+
 import swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
+import { PaginatorCliente } from './pageable.models';
 
 @Component({
   selector: 'app-clientes',
@@ -11,17 +13,14 @@ import { tap } from 'rxjs/operators';
 })
 export class ClientesComponent implements OnInit {
 
-  clientes: Cliente[];
+  clientes: Cliente[]; 
+  paginator:PaginatorCliente;
+  page:number=0;
 
   constructor(private clienteService: ClienteService, private router:Router) { }
 
   ngOnInit() {
-    this.clienteService.getClientes().pipe(
-      tap(clientes=>{
-        this.clientes = clientes
-        //alert(clientes)
-      })
-    ).subscribe();//sin el subscribe no se ejecuta
+    this.cargarClientes();
   }
 
   delete(cliente:Cliente){
@@ -47,6 +46,22 @@ export class ClientesComponent implements OnInit {
         
       }
     })
+  }
+
+
+  cargarClientes(){
+    this.clienteService.getClientesPage(this.page).pipe(
+      tap(paginador=>{
+        this.paginator = paginador; 
+        this.clientes = paginador.content;
+        //alert(clientes)
+      })
+    ).subscribe();
+  }
+
+  change(e:number){
+    this.page=e; 
+    this.cargarClientes();
   }
 
 }

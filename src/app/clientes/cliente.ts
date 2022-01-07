@@ -12,7 +12,7 @@ export interface SuccesCliente{
 }
 
 export class ClienteErrors{
-  nombre?:string,
-  apellido?:string,
-  email?:string,
+  nombre?:string;
+  apellido?:string;
+  email?:string;
 }

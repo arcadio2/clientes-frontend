@@ -1,0 +1,28 @@
+<ul *ngIf="paginas?.length>0" class="pagination">
+ 
+  <li class="page-item" [ngClass]="paginator.number==0?'disabled':''">
+    <a class="page-link" (click)="onPaginator(0)">Primera</a>
+  </li>
+
+  <li class="page-item" [ngClass]="paginator.number!=0?'':'disabled'">
+    <a class="page-link" (click)="onPaginator(paginator.number-1)">&laquo;</a>
+  </li>
+  <li *ngFor="let pagina of paginas" class="page-item" [ngClass]="pagina-1==paginator.number?'active':''">
+    
+    <span *ngIf="pagina-1 == paginator.number"  
+        class="page-link " >{{pagina}}</span>
+
+    <a (click)="onPaginator(pagina-1)" class="page-link dar-click" *ngIf="pagina-1 != paginator.number">
+      {{pagina}}
+    </a> 
+    
+  </li>
+  <li class="page-item" [ngClass]="paginator.number+1==paginator.totalPages?'disabled':''">
+    <a class="page-link" (click)="onPaginator(paginator.number+1)">&raquo;</a>
+  </li>
+
+  <li class="page-item" [ngClass]="paginator.number==paginator.totalPages-1?'disabled':''">
+    <a class="page-link" (click)="onPaginator(paginator.totalPages-1)">Ultima</a>
+  </li>
+
+</ul>
