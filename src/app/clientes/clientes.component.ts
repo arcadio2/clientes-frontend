@@ -6,21 +6,36 @@ import swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { PaginatorCliente } from './pageable.models';
+import { ModalService } from './detalle/modal.service';
 
 @Component({
   selector: 'app-clientes',
-  templateUrl: './clientes.component.html'
+  templateUrl: './clientes.component.html',
+  providers:[ModalService]
 })
 export class ClientesComponent implements OnInit {
 
   clientes: Cliente[]; 
+  clienteSeleccionado:Cliente;
   paginator:PaginatorCliente;
   page:number=0;
 
-  constructor(private clienteService: ClienteService, private router:Router) { }
+  constructor(private clienteService: ClienteService, 
+              private router:Router, public modalService:ModalService) { }
 
   ngOnInit() {
     this.cargarClientes();
+   
+    /**Se ejecuta cada que se emite */
+    this.modalService.notificarUpload.subscribe(cliente=>{
+      console.log("xdddd2")
+      this.clientes = this.clientes.map(clienteOriginal=>{
+        if(cliente.id==clienteOriginal.id){
+          clienteOriginal.foto = cliente.foto;
+        }
+        return clienteOriginal;
+      })
+    })
   }
 
   delete(cliente:Cliente){
@@ -63,5 +78,14 @@ export class ClientesComponent implements OnInit {
     this.page=e; 
     this.cargarClientes();
   }
+  openModal(cliente:Cliente){
+    this.clienteSeleccionado=cliente;
+    //console.log(this.modalService.modal)
+    this.cargarClientes();
+    this.modalService.abrirModal();
+    
+    
+  }
+
 
 }

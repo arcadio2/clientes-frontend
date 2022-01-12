@@ -4,11 +4,12 @@ import { Cliente, SuccesCliente } from './cliente';
 import { Observable } from 'rxjs/Observable';
 import {_throw} from 'rxjs/observable/throw' ;
 import { of } from 'rxjs/observable/of';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { map,catchError,tap } from 'rxjs/operators';
 import swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { PaginatorCliente } from './pageable.models';
+import { Region } from './region';
 
 
 @Injectable()
@@ -18,6 +19,25 @@ export class ClienteService {
 
 
   constructor(private http: HttpClient, private router:Router) { }
+
+  private isNotAuthorized(e):boolean{
+    if(e.status == 401 || e.status == 403){
+      this.router.navigateByUrl('/login');
+      return true; 
+    }
+    return false;
+  }
+
+
+  getRegiones():Observable<Region[]>{
+    return this.http.get<Region[]>(this.urlEndPoint+'/regiones').pipe(
+      catchError(e=>{
+        this.isNotAuthorized(e);
+        return _throw(e);
+      })
+    )
+  }
+
 
   getClientes(): Observable<Cliente[]> {
     //return of(CLIENTES);
@@ -49,6 +69,9 @@ export class ClienteService {
     return this.http.get<Cliente>(`${this.urlEndPoint}/${id}`).pipe(
     
       catchError(e=>{
+        if(this.isNotAuthorized(e)){
+          return _throw(e);
+        }
         this.router.navigateByUrl('/clientes');
         swal.fire("Error al cargar",e.error.mensaje,'error');
         return _throw(e);
@@ -65,6 +88,9 @@ export class ClienteService {
         return response.cliente as Cliente; 
       }),
       catchError(e=>{
+        if(this.isNotAuthorized(e)){
+          return _throw(e);
+        }
         if(e.status==400){
           return _throw(e);
         }
@@ -77,6 +103,9 @@ export class ClienteService {
   update(cliente:Cliente):Observable<SuccesCliente>{
     return this.http.put<Cliente>(`${this.urlEndPoint}/${cliente.id}`,cliente,{headers:this.httpHeaders}).pipe(
       catchError(e=>{
+        if(this.isNotAuthorized(e)){
+          return _throw(e);
+        }
         if(e.status==400){
           console.log(e)
           return _throw(e);
@@ -89,11 +118,43 @@ export class ClienteService {
 
   delete(id:number):Observable<any>{
     return this.http.delete<any>(`${this.urlEndPoint}/${id}`,{headers:this.httpHeaders}).pipe(
+      
       catchError(e=>{
+        if(this.isNotAuthorized(e)){
+          return _throw(e);
+        }
         swal.fire("Error al Eliminar",e.error.mensaje,'error');
         return _throw(e)
       })
     )
+  }
+
+  subirFoto(archivo:File, id):Observable<HttpEvent<{}>>{
+    //creamos un formulario desde aqui
+    let data:FormData  = new FormData();
+    data.append("file",archivo); //nombre en el backend
+    data.append("id",id); 
+    const req = new HttpRequest('POST',`${this.urlEndPoint}/upload`,data, {
+      reportProgress: true
+    });
+    return this.http.request(req).pipe(
+      catchError(e=>{
+        this.isNotAuthorized(e);
+        return _throw(e);
+      })
+    );
+    /*return this.http.request(req).pipe(
+      map((response:any)=>{
+        return response.cliente as Cliente; 
+      }),
+      catchError(e=>{
+        console.log(e)
+        swal.fire("Error al subir foto ",e.error.mensaje,'error');
+        return _throw(e)
+      })
+
+    )*/
+
   }
 
 }

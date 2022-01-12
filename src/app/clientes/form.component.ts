@@ -5,6 +5,7 @@ import { Cliente, ClienteErrors } from './cliente';
 import { ClienteService } from './cliente.service';
 import swal from 'sweetalert2';
 import { Observable } from 'rxjs/Observable';
+import { Region } from './region';
 
 @Component({
   selector: 'app-form',
@@ -15,6 +16,7 @@ export class FormComponent implements OnInit {
   titulo:string='Crear Cliente';
 
   private cliente: Cliente = new Cliente();
+  private regiones:Region[];
   private errors:ClienteErrors=new ClienteErrors();
 
 
@@ -34,6 +36,9 @@ export class FormComponent implements OnInit {
           this.cliente=cliente
         });
       }
+    })
+    this.clienteService.getRegiones().subscribe((regiones)=>{
+      this.regiones = regiones; 
     })
   }
 
@@ -59,6 +64,11 @@ export class FormComponent implements OnInit {
     }
     );
   }
+  compareRegion(o1:Region,o2:Region):boolean{
+    if(o1 === undefined && o2 === undefined){
+      return true;
+    }
+    return o1===null || o2===null || o1===undefined || o2===undefined? false:o1.id===o2.id;  
+  } 
 
-
-}
+} 
