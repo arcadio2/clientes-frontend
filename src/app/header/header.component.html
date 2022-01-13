@@ -15,20 +15,22 @@
       <li class="nav-item" routerLinkActive="active">
         <a class="nav-link" routerLink="/clientes">Clientes</a>
       </li>
-      
+
     
     </ul>
+    
     <ul class="navbar-nav navbar-right">
       <li><a *ngIf="!auth.isAuthenticated()" routerLink="/login" class="btn btn-outline-primary">LogIn</a></li>
-      <li class="dropdown">
-        <a class="btn btn-outline-secondary dropdown-toggle">
-          {{usuario.username}}
-          xd
+      <li class="dropdown show" *ngIf="auth.isAuthenticated()">
+        <a class="btn btn-outline-primary dropdown-toggle" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{auth.usuario.username}}
         </a>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-          <button class="dropdown-item" type="submit">Logout</button>
+        
+        <div  class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          <button (click)="logout()" class="dropdown-item" type="submit">Logout</button>
         </div>
       </li>
+      
     </ul>
 
 

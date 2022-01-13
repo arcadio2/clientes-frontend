@@ -16,6 +16,10 @@ import { registerLocaleData } from '@angular/common';
 import { PaginatorComponent } from './paginator/paginator.component';
 import { DetalleComponent } from './clientes/detalle/detalle.component';
 import { LoginComponent } from './usuarios/login.component';
+import { AuthService } from './usuarios/auth.service';
+import { AuthGuard } from './usuarios/guards/auth.guard';
+import { ModalService } from './clientes/detalle/modal.service';
+import { RoleGuard } from './usuarios/guards/role.guard';
 
 
 registerLocaleData(localeEs,'es');
@@ -23,8 +27,10 @@ const routes: Routes = [
   {path: '', redirectTo: '/clientes', pathMatch: 'full'},
   {path: 'directivas', component: DirectivaComponent},
   {path: 'clientes', component: ClientesComponent},
-  {path:'clientes/form',component:FormComponent},
-  {path:'clientes/form/:id',component:FormComponent},
+  {path:'clientes/form',component:FormComponent, 
+                canActivate:[AuthGuard,RoleGuard],data:{role:'ROLE_ADMIN'}},
+  {path:'clientes/form/:id',component:FormComponent, 
+                canActivate:[AuthGuard,RoleGuard],data:{role:'ROLE_ADMIN'}},
   {path:'login',component:LoginComponent},
   //{path:'clientes/ver/:id',component:DetalleComponent},
   {path:'**',redirectTo:'/clientes'}
@@ -45,7 +51,8 @@ const routes: Routes = [
     FormsModule,
     RouterModule.forRoot(routes)
   ],
-  providers: [ClienteService, {provide:LOCALE_ID, useValue:'es'}],
+  providers: [ClienteService, {provide:LOCALE_ID, useValue:'es'},
+              AuthService,ModalService,AuthGuard,RoleGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

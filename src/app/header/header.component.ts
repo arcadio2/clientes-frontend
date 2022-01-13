@@ -5,8 +5,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
-  templateUrl: './header.component.html',
-  providers:[AuthService]
+  templateUrl: './header.component.html'
 })
 export class HeaderComponent {
   title: string = 'App Angular'
@@ -17,8 +16,17 @@ export class HeaderComponent {
   }
 
   ngOnInit() {
+    
     if(this.auth.isAuthenticated()){
       this.usuario = this.auth.usuario;
+      console.log(this.usuario)
     }
   } 
+
+  logout(){  
+    this.usuario = undefined;
+    this.auth.logout();
+    this.router.navigateByUrl('/clientes');
+  
+  }
 }

@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import Swal from 'sweetalert2';
 import { HttpEventType } from '@angular/common/http';
 import { ModalService } from './modal.service';
+import { AuthService } from '../../usuarios/auth.service';
 @Component({
   selector: 'app-detalle',
   templateUrl: './detalle.component.html',
@@ -18,7 +19,7 @@ export class DetalleComponent implements OnInit {
   
   private abierta:boolean = false; 
   private fotoSeleccionada:File; 
-  constructor(private clienteService:ClienteService,
+  constructor(private clienteService:ClienteService, private auth:AuthService,
             private activatedRoute:ActivatedRoute,
             public modalService:ModalService) { }
 
@@ -30,7 +31,7 @@ export class DetalleComponent implements OnInit {
         this.clienteService.getCliente(id).subscribe(cliente=>{
           this.cliente = cliente; 
         })
-      }
+      } 
     }) */
   }
   selectFoto(e){
@@ -39,7 +40,7 @@ export class DetalleComponent implements OnInit {
     if(this.fotoSeleccionada.type.indexOf('image')<0){
       Swal.fire('ERROR','Debe seleccionar una foto válida','error');
       this.fotoSeleccionada = null;
-    }
+    } 
     
   }
   subirFoto(){

@@ -7,28 +7,28 @@ import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { PaginatorCliente } from './pageable.models';
 import { ModalService } from './detalle/modal.service';
+import { AuthService } from '../usuarios/auth.service';
 
 @Component({
   selector: 'app-clientes',
-  templateUrl: './clientes.component.html',
-  providers:[ModalService]
+  templateUrl: './clientes.component.html'
 })
 export class ClientesComponent implements OnInit {
 
-  clientes: Cliente[]; 
+  clientes: Cliente[];  
   clienteSeleccionado:Cliente;
   paginator:PaginatorCliente;
   page:number=0;
 
-  constructor(private clienteService: ClienteService, 
+  constructor(private clienteService: ClienteService, private auth:AuthService,
               private router:Router, public modalService:ModalService) { }
 
   ngOnInit() {
     this.cargarClientes();
-   
+    
     /**Se ejecuta cada que se emite */
     this.modalService.notificarUpload.subscribe(cliente=>{
-      console.log("xdddd2")
+
       this.clientes = this.clientes.map(clienteOriginal=>{
         if(cliente.id==clienteOriginal.id){
           clienteOriginal.foto = cliente.foto;
@@ -69,7 +69,7 @@ export class ClientesComponent implements OnInit {
       tap(paginador=>{
         this.paginator = paginador; 
         this.clientes = paginador.content;
-        //alert(clientes)
+        
       })
     ).subscribe();
   }

@@ -10,11 +10,11 @@ export class AuthService {
   private _token:string;
 
   constructor(private http:HttpClient) { }
-  
+   
   public get usuario(){
-    if(this._usuario && this._usuario!=null){
-      return {...this._usuario};
-    }else if((this.usuario==null || !this.usuario) && localStorage.getItem('usuario') !=null){
+    if(this._usuario!=null){
+      return {...this._usuario}; 
+    }else if((this._usuario==null) && localStorage.getItem('usuario') !=null){
       this._usuario= JSON.parse(localStorage.getItem('usuario') )as Usuario;
       
       return {...this._usuario};
@@ -74,7 +74,7 @@ export class AuthService {
     }
   }
 
-  isAuthenticated():boolean{
+  isAuthenticated():boolean{  
     let payload = this.obtenerDatosToken(this.token);
     if(payload && payload !=null && payload.user_name && payload.user_name.length>0){
       return true; 
@@ -82,4 +82,18 @@ export class AuthService {
     return false; 
   }
 
+  hasRole(role:string):boolean{
+    if(this.usuario.roles.includes(role)){
+      return true; 
+    }
+    return false; 
+  }
+
+  logout(){
+    this._token=null;
+    this._usuario=null; 
+    localStorage.clear();
+    sessionStorage.clear();
+    
+  }
 }

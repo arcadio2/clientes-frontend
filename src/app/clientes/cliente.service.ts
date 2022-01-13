@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Component } from '@angular/core';
 import { CLIENTES } from './clientes.json';
 import { Cliente, SuccesCliente } from './cliente';
 import { Observable } from 'rxjs/Observable';
@@ -10,19 +10,42 @@ import swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { PaginatorCliente } from './pageable.models';
 import { Region } from './region';
+import { AuthService } from '../usuarios/auth.service';
+import Swal from 'sweetalert2';
 
 
-@Injectable()
+@Injectable(
+  
+)
+
 export class ClienteService {
   private urlEndPoint: string = 'http://localhost:8080/api/clientes';
-  private httpHeaders = new HttpHeaders({'Content-type':'application/json'});
+  private httpHeaders = new HttpHeaders({'Content-type':'application/json'}); //es inmutable
 
 
-  constructor(private http: HttpClient, private router:Router) { }
+  constructor(private http: HttpClient, private router:Router, private auth:AuthService) { }
+
+  private addAuthorizationHeader(){
+    let token = this.auth.token; 
+    console.log(token)
+    if(token != null){
+      return this.httpHeaders.append('Authorization','Bearer '+token)
+    }
+    return this.httpHeaders;
+  }
+
 
   private isNotAuthorized(e):boolean{
-    if(e.status == 401 || e.status == 403){
+    if(e.status == 401 ){
+      if(this.auth.isAuthenticated()){
+        this.auth.logout();
+      }
       this.router.navigateByUrl('/login');
+      return true; 
+    }
+    if( e.status == 403){
+      Swal.fire('Acceso denegado','No tienes acceso a este recurso','warning');
+      this.router.navigateByUrl('/clientes');
       return true; 
     }
     return false;
@@ -66,10 +89,11 @@ export class ClienteService {
 
 
   getCliente(id:number):Observable<Cliente>{
-    return this.http.get<Cliente>(`${this.urlEndPoint}/${id}`).pipe(
+    return this.http.get<Cliente>(`${this.urlEndPoint}/${id}`,{headers:this.addAuthorizationHeader()} ).pipe(
     
       catchError(e=>{
         if(this.isNotAuthorized(e)){
+          console.log(e)
           return _throw(e);
         }
         this.router.navigateByUrl('/clientes');
@@ -82,7 +106,7 @@ export class ClienteService {
 
 
   create(cliente:Cliente):Observable<Cliente>{
-    return this.http.post<Cliente>(this.urlEndPoint,cliente,{headers:this.httpHeaders}).pipe(
+    return this.http.post<Cliente>(this.urlEndPoint,cliente,{headers:this.addAuthorizationHeader()}).pipe(
       map( (response:any)=>{
 
         return response.cliente as Cliente; 
@@ -101,8 +125,12 @@ export class ClienteService {
   }
 
   update(cliente:Cliente):Observable<SuccesCliente>{
-    return this.http.put<Cliente>(`${this.urlEndPoint}/${cliente.id}`,cliente,{headers:this.httpHeaders}).pipe(
+    return this.http.put<SuccesCliente>(`${this.urlEndPoint}/${cliente.id}`,cliente,{headers:this.addAuthorizationHeader()}).pipe(
+      tap(resp=>{
+        console.log(resp)
+      }),
       catchError(e=>{
+        console.log("eeror"+e)
         if(this.isNotAuthorized(e)){
           return _throw(e);
         }
@@ -117,7 +145,7 @@ export class ClienteService {
   }
 
   delete(id:number):Observable<any>{
-    return this.http.delete<any>(`${this.urlEndPoint}/${id}`,{headers:this.httpHeaders}).pipe(
+    return this.http.delete<any>(`${this.urlEndPoint}/${id}`,{headers:this.addAuthorizationHeader()}).pipe(
       
       catchError(e=>{
         if(this.isNotAuthorized(e)){
@@ -133,9 +161,15 @@ export class ClienteService {
     //creamos un formulario desde aqui
     let data:FormData  = new FormData();
     data.append("file",archivo); //nombre en el backend
-    data.append("id",id); 
+    data.append("id",id);   
+    let httpHeaders = new HttpHeaders();
+    let token = this.auth.token;
+    if(token!=null){
+      httpHeaders = httpHeaders.append('Authorization','Bearer '+token);
+    }
     const req = new HttpRequest('POST',`${this.urlEndPoint}/upload`,data, {
-      reportProgress: true
+      reportProgress: true,
+      headers:httpHeaders
     });
     return this.http.request(req).pipe(
       catchError(e=>{

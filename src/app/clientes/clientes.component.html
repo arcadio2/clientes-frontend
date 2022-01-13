@@ -6,7 +6,9 @@
     <h5 class="card-title">Listado de clientes</h5>
 
     <div class="my-2 text-left">
-      <button class="btn btn-rounded btn-primary" type="button" routerLink="/clientes/form">Crear cliente</button>
+      <button class="btn btn-rounded btn-primary" type="button" 
+            *ngIf="auth.hasRole('ROLE_ADMIN')"
+            routerLink="/clientes/form">Crear cliente</button>
     </div>
 
 
@@ -14,18 +16,18 @@
     <table class="table table-bordered table-striped" *ngIf="clientes?.length>0">
       <thead>
         <tr>
-          <th>#</th>
+          <th  *ngIf="auth.hasRole('ROLE_USER')">#</th>
           <th>nombre</th>
           <th>apellido</th>
           <th>email</th>
           <th>fecha</th>
-          <th>Editar</th>
-          <th>Eliminar</th>
+          <th  *ngIf="auth.hasRole('ROLE_ADMIN')">Editar</th>
+          <th  *ngIf="auth.hasRole('ROLE_ADMIN')">Eliminar</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let cliente of clientes">
-          <td>
+          <td  *ngIf="auth.hasRole('ROLE_USER')">
             <img *ngIf="cliente?.foto" class="img-thumbnail rounded dar-click" (click)="openModal(cliente)"
             style="width: 64px;"
             src="http://localhost:8080/api/clientes/uploads/img/{{cliente.foto}}" alt="{{cliente.foto}}">
@@ -33,17 +35,17 @@
             <img *ngIf="!cliente?.foto" class="img-thumbnail rounded dar-click" (click)="openModal(cliente)"
             style="width: 64px;"
             src="http://localhost:8080/images/no_user.png" alt="foto">
-
+            </td>
             <!-- <button  (click)="openModal(cliente)" class="btn btn-success">{{ cliente.id }}</button></td> -->
           <td>{{ cliente.nombre | titlecase}}</td>
           <td>{{ cliente.apellido | titlecase}}</td>
           <td>{{ cliente.email }}</td>
           <td>{{ cliente.createAt | date }}</td>
-          <td>
+          <td  *ngIf="auth.hasRole('ROLE_ADMIN')">
             <button type="button" name="button" class="btn btn-primary"
               [routerLink]="['/clientes/form',cliente.id]">Editar</button>
           </td>
-          <td>
+          <td  *ngIf="auth.hasRole('ROLE_ADMIN')">
             <button type="button" name="button" class="btn btn-danger"
               (click)="delete(cliente)">Eliminar</button>
           </td>
