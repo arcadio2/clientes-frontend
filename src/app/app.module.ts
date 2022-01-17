@@ -8,7 +8,7 @@ import { DirectivaComponent } from './directiva/directiva.component';
 import { ClientesComponent } from './clientes/clientes.component';
 import { ClienteService } from './clientes/cliente.service';
 import { RouterModule, Routes} from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormComponent } from './clientes/form.component';
 import { FormsModule } from '@angular/forms';
 import localeEs from '@angular/common/locales/es';
@@ -20,6 +20,10 @@ import { AuthService } from './usuarios/auth.service';
 import { AuthGuard } from './usuarios/guards/auth.guard';
 import { ModalService } from './clientes/detalle/modal.service';
 import { RoleGuard } from './usuarios/guards/role.guard';
+import { tokenInterceptor } from './usuarios/interceptors/token.interceptor';
+import { DetalleFacturaComponent } from './facturas/detalle-factura/detalle-factura.component';
+import { FacturasService } from './facturas/services/facturas.service';
+import { FacturasComponent } from './facturas/facturas.component';
 
 
 registerLocaleData(localeEs,'es');
@@ -32,6 +36,8 @@ const routes: Routes = [
   {path:'clientes/form/:id',component:FormComponent, 
                 canActivate:[AuthGuard,RoleGuard],data:{role:'ROLE_ADMIN'}},
   {path:'login',component:LoginComponent},
+  {path:'facturas/:id',component:DetalleFacturaComponent,canActivate:[AuthGuard,RoleGuard],data:{role:'ROLE_USER'}},
+  {path:'facturas/form/:clienteId',component:FacturasComponent,canActivate:[AuthGuard,RoleGuard],data:{role:'ROLE_ADMIN'}},
   //{path:'clientes/ver/:id',component:DetalleComponent},
   {path:'**',redirectTo:'/clientes'}
 ];
@@ -43,16 +49,19 @@ const routes: Routes = [
     FooterComponent,
     DirectivaComponent, 
     ClientesComponent,  
-    FormComponent, PaginatorComponent, DetalleComponent, LoginComponent
+    FormComponent, PaginatorComponent, DetalleComponent, LoginComponent, DetalleFacturaComponent, FacturasComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     FormsModule,
+ 
     RouterModule.forRoot(routes)
   ],
   providers: [ClienteService, {provide:LOCALE_ID, useValue:'es'},
-              AuthService,ModalService,AuthGuard,RoleGuard],
-  bootstrap: [AppComponent]
+              AuthService,ModalService,AuthGuard,RoleGuard,
+              FacturasService
+              /* {provide:HTTP_INTERCEPTORS,useClass:tokenInterceptor,multi:true}  */],
+  bootstrap: [AppComponent] 
 })
 export class AppModule { }

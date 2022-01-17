@@ -6,12 +6,12 @@ import {_throw} from 'rxjs/observable/throw' ;
 import { of } from 'rxjs/observable/of';
 import { HttpClient, HttpEvent, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { map,catchError,tap } from 'rxjs/operators';
-import swal from 'sweetalert2';
+
 import { Router } from '@angular/router';
 import { PaginatorCliente } from './pageable.models';
 import { Region } from './region';
 import { AuthService } from '../usuarios/auth.service';
-import Swal from 'sweetalert2';
+const Swal = require('sweetalert2');
 
 
 @Injectable(
@@ -23,7 +23,7 @@ export class ClienteService {
   private httpHeaders = new HttpHeaders({'Content-type':'application/json'}); //es inmutable
 
 
-  constructor(private http: HttpClient, private router:Router, private auth:AuthService) { }
+  constructor(private http: HttpClient, private router:Router, public auth:AuthService) { }
 
   private addAuthorizationHeader(){
     let token = this.auth.token; 
@@ -97,7 +97,7 @@ export class ClienteService {
           return _throw(e);
         }
         this.router.navigateByUrl('/clientes');
-        swal.fire("Error al cargar",e.error.mensaje,'error');
+        Swal.fire("Error al cargar",e.error.mensaje,'error');
         return _throw(e);
       }) 
     )
@@ -118,7 +118,7 @@ export class ClienteService {
         if(e.status==400){
           return _throw(e);
         }
-        swal.fire("Error al Crear",e.error.mensaje,'error');
+        Swal.fire("Error al Crear",e.error.mensaje,'error');
         return _throw(e)
       })
     )
@@ -135,10 +135,10 @@ export class ClienteService {
           return _throw(e);
         }
         if(e.status==400){
-          console.log(e)
+          Swal.fire("Error al Editar","No se ha podido procesar la solicitud",'error');
           return _throw(e);
         }
-        swal.fire("Error al Editar",e.error.mensaje,'error');
+        Swal.fire("Error al Editar",e.error.mensaje,'error');
         return _throw(e)
       })
     )
@@ -151,7 +151,7 @@ export class ClienteService {
         if(this.isNotAuthorized(e)){
           return _throw(e);
         }
-        swal.fire("Error al Eliminar",e.error.mensaje,'error');
+        Swal.fire("Error al Eliminar",e.error.mensaje,'error');
         return _throw(e)
       })
     )

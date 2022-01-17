@@ -2,10 +2,12 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Cliente } from '../cliente';
 import { ClienteService } from '../cliente.service';
 import { ActivatedRoute } from '@angular/router';
-import Swal from 'sweetalert2';
+const Swal = require('sweetalert2');
 import { HttpEventType } from '@angular/common/http';
 import { ModalService } from './modal.service';
 import { AuthService } from '../../usuarios/auth.service';
+import { Factura } from '../../facturas/models/factura';
+import { FacturasService } from '../../facturas/services/facturas.service';
 @Component({
   selector: 'app-detalle',
   templateUrl: './detalle.component.html',
@@ -19,8 +21,9 @@ export class DetalleComponent implements OnInit {
   
   private abierta:boolean = false; 
   private fotoSeleccionada:File; 
-  constructor(private clienteService:ClienteService, private auth:AuthService,
+  constructor(public clienteService:ClienteService, public auth:AuthService,
             private activatedRoute:ActivatedRoute,
+            private facturaService:FacturasService,
             public modalService:ModalService) { }
 
   ngOnInit() {
@@ -70,6 +73,31 @@ export class DetalleComponent implements OnInit {
     this.abierta = false; 
     console.log("xd")
     this.modalService.cerrarModal();
+  }
+  delete(factura:Factura){
+    Swal.fire({
+      title: 'Estás seguro?',
+      text: `Seguro que quieres eliminar la factura ${factura.descripcion} `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, Eliminar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.facturaService.delete(factura.id).subscribe(response=>{
+          this.cliente.facturas = this.cliente.facturas.filter(f=>f!==factura);
+          //this.router.navigateByUrl('/clientes'); 
+          Swal.fire(
+            'Factura Eliminada!',
+            'Eliminado con éxito.',
+            'success'
+          )
+        })
+        
+      }
+    })
+   
   }
 
 }

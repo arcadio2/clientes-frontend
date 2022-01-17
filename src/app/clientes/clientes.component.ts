@@ -2,25 +2,25 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { Cliente } from './cliente';
 import { ClienteService } from './cliente.service';
 
-import swal from 'sweetalert2';
+const Swal = require('sweetalert2');
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { PaginatorCliente } from './pageable.models';
 import { ModalService } from './detalle/modal.service';
 import { AuthService } from '../usuarios/auth.service';
-
+  
 @Component({
   selector: 'app-clientes',
   templateUrl: './clientes.component.html'
 })
 export class ClientesComponent implements OnInit {
-
+ 
   clientes: Cliente[];  
   clienteSeleccionado:Cliente;
   paginator:PaginatorCliente;
   page:number=0;
 
-  constructor(private clienteService: ClienteService, private auth:AuthService,
+  constructor(private clienteService: ClienteService, public auth:AuthService,
               private router:Router, public modalService:ModalService) { }
 
   ngOnInit() {
@@ -39,7 +39,7 @@ export class ClientesComponent implements OnInit {
   }
 
   delete(cliente:Cliente){
-    swal.fire({
+    Swal.fire({
       title: 'Estás seguro?',
       text: `Seguro que quieres eliminar al cliente ${cliente.nombre} ${cliente.apellido}`,
       icon: 'warning',
@@ -52,7 +52,7 @@ export class ClientesComponent implements OnInit {
         this.clienteService.delete(cliente.id).subscribe(response=>{
           this.clientes = this.clientes.filter(cli=>cli!==cliente);
           //this.router.navigateByUrl('/clientes'); 
-          swal.fire(
+          Swal.fire(
             'Cliente Eliminado!',
             'Your file has been deleted.',
             'success'
@@ -83,9 +83,9 @@ export class ClientesComponent implements OnInit {
     //console.log(this.modalService.modal)
     this.cargarClientes();
     this.modalService.abrirModal();
+     
     
-    
-  }
+  } 
 
 
-}
+} 

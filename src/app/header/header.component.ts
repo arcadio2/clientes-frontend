@@ -11,7 +11,7 @@ export class HeaderComponent {
   title: string = 'App Angular'
   usuario:Usuario=undefined;
 
-  constructor(private auth:AuthService,private router:Router) {
+  constructor(public auth:AuthService,private router:Router) {
     this.usuario = new Usuario();
   }
 
